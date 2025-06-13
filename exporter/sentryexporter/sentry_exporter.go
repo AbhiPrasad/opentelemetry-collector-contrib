@@ -137,7 +137,7 @@ func (s *SentryExporter) pushTraceData(_ context.Context, td ptrace.Traces) erro
 
 	transactions = append(transactions, exceptionEvents...)
 
-	s.transport.SendEvents(transactions)
+	s.transport.SendTransactionEvents(transactions)
 
 	return nil
 }
@@ -477,8 +477,12 @@ func generateEventID() sentry.EventID {
 	return sentry.EventID(uuid())
 }
 
-// createSentryExporter returns a new Sentry Exporter.
-func createSentryExporter(config *Config, set exporter.Settings) (exporter.Traces, error) {
+// returns a new Sentry Exporter.
+func newSentryTracesExporter(config *Config, set exporter.Settings) (exporter.Traces, error) {
+	if !config.EnableTracing {
+		return nil, nil
+	}
+
 	transport := newSentryTransport()
 
 	clientOptions := sentry.ClientOptions{

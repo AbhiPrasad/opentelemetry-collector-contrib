@@ -21,11 +21,15 @@ func NewFactory() exporter.Factory {
 		metadata.Type,
 		createDefaultConfig,
 		exporter.WithTraces(createTracesExporter, metadata.TracesStability),
+		exporter.WithLogs(createSentryLogsExporter, metadata.LogsStability),
 	)
 }
 
 func createDefaultConfig() component.Config {
-	return &Config{}
+	return &Config{
+		EnableTracing: true,
+		EnableLogs:    true,
+	}
 }
 
 func createTracesExporter(
@@ -39,6 +43,19 @@ func createTracesExporter(
 	}
 
 	// Create exporter based on sentry config.
-	exp, err := createSentryExporter(sentryConfig, params)
-	return exp, err
+	return newSentryTracesExporter(sentryConfig, params)
+}
+
+func createSentryLogsExporter(
+	_ context.Context,
+	params exporter.Settings,
+	config component.Config,
+) (exporter.Logs, error) {
+	sentryConfig, ok := config.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("unexpected config type: %T", config)
+	}
+
+	// Create logs exporter based on sentry config.
+	return newSentryLogsExporter(sentryConfig, params)
 }

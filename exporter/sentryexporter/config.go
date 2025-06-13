@@ -17,6 +17,10 @@ type Config struct {
 	Environment string `mapstructure:"environment"`
 	// InsecureSkipVerify controls whether the client verifies the Sentry server certificate chain
 	InsecureSkipVerify bool `mapstructure:"insecure_skip_verify"`
+	// EnableTracing controls whether the exporter will send traces to Sentry.
+	EnableTracing bool `mapstructure:"enable_tracing"`
+	// EnableLogs controls whether the exporter will send logs to Sentry.
+	EnableLogs bool `mapstructure:"enable_logs"`
 }
 
 // Validate checks if the exporter configuration is valid
